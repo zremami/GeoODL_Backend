@@ -1,20 +1,40 @@
 from flask import Flask
-from datetime import datetime
-from owslib.wfs import WebFeatureService
 from owslib.fes import *
+from datetime import datetime
 import xml.dom.minidom # WFS returns GML - this library is used to parse it
 import json
+import pandas as pd
+from IPython.display import display
 
-wfs11 = WebFeatureService(url='https://www.imis.bfs.de/ogc/opendata/ows', version='1.1.0')
-wTitle= wfs11.identification.title
+def getWFSData():
+    from owslib.wfs import WebFeatureService
 
-filter1= PropertyIsLike(propertyname='kenn', literal='096781381',wildCard='*')
-filter2 = PropertyIsGreaterThanOrEqualTo(propertyname='end_measure', literal='2022-10-31')
-filters=[filter1,filter2]
+    wfs11 = WebFeatureService(url='https://www.imis.bfs.de/ogc/opendata/ows', version='1.1.0')
 
-filterxml = etree.tostring(And(operations=filters).toXML()).decode("utf-8")
+    filter1 = PropertyIsGreaterThanOrEqualTo(propertyname='start_measure', literal='2022-12-01')
+    #filter1 = PropertyIsBetween(propertyname='start_measure', lower='2022-11-01',upper='2022-11-02')
+    filter2 = PropertyIsLike(propertyname='kenn', literal='141772901',wildCard='*')
+    #filters3= PropertyIsLike(propertyname='local_authority', literal='Ulm',wildCard='*')
+    filters=[filter1,filter2]
 
-response = wfs11.getfeature(typename='opendata:odlinfo_timeseries_precipitation_15min',filter=filterxml,bbox=(7.800293,47.709762,13.579102,54.033586), srsname='EPSG:4326', maxfeatures=100,outputFormat='application/json')
-bytesD=bytes(response.read())
-# convert to json
-data = json.loads(bytesD)
+    filterxml = etree.tostring(And(operations=filters).toXML()).decode("utf-8")
+
+    #odlinfo_timeseries_precipitation_15min
+    #odlinfo_timeseries_odl_1h
+    response = wfs11.getfeature(typename='odlinfo_timeseries_precipitation_15min',filter = filterxml,outputFormat='application/json',maxfeatures=900)
+    # convert IO-byte to bytes
+    bytesD=bytes(response.read())
+    # convert to json
+    data = json.loads(bytesD)
+    return data   
+
+"""for index in range(len(datanorm)):
+kenn=datanorm['properties.kenn'][index], 
+value=datanorm['properties.value'][index],
+start_measure=datanorm['properties.start_measure'][index],
+end_measure=datanorm['properties.end_measure'][index]
+print(index ,':' , value,kenn,start_measure,end_measure)"""
+
+"""for i in datanorm:
+value = datanorm['properties.kenn']
+print(value)"""
