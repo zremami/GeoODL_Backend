@@ -8,14 +8,16 @@ from IPython.display import display
 from owslib.wfs import WebFeatureService
 
 #https://www.imis.bfs.de/ogc/opendata/ows
+#https://entw-imis.lab.bfs.de/ogc/opendata/wfs
 wfs11 = WebFeatureService(url='https://entw-imis.lab.bfs.de/ogc/opendata/wfs', version='1.1.0')
+currdate = datetime.date.today()-datetime.timedelta(1)
 
 def getOdl_1h():
-    
-
-    filter1 = PropertyIsGreaterThanOrEqualTo(propertyname='end_measure', literal='2022-01-01')
+    #filter1 = PropertyIsGreaterThanOrEqualTo(propertyname='start', literal='2022-01-01')
+    filter1 = PropertyIsBetween(propertyname='start', lower='2022-01-01' ,upper= currdate)
     #filter1 = PropertyIsBetween(propertyname='start_measure', lower='2022-11-01',upper='2022-11-02')
-    filter2 = PropertyIsLike(propertyname='id', literal='DEZ2210',wildCard='*')
+    filter2 = PropertyIsLike(propertyname='id', literal='DEZ0402',wildCard='*')
+    #filter3 = PropertyIsLike(propertyname='network', literal='BfS',wildCard='*')
     #filters3= PropertyIsLike(propertyname='local_authority', literal='Ulm',wildCard='*')
     filters=[filter1,filter2]
 
@@ -23,6 +25,8 @@ def getOdl_1h():
 
     #odlinfo_timeseries_precipitation_15min
     #odlinfo_timeseries_odl_1h
+    #opendata:public_odl_brutto_1h
+    #opendata:odl_brutto_1h
     response = wfs11.getfeature(typename='opendata:public_odl_brutto_1h',filter = filterxml,outputFormat='application/json')
     # convert IO-byte to bytes
     bytesD=bytes(response.read())
@@ -32,9 +36,10 @@ def getOdl_1h():
 
 def getPrecipitation_15min():
 
-    filter1 = PropertyIsGreaterThanOrEqualTo(propertyname='end_measure', literal='2022-01-01')
+    #filter1 = PropertyIsGreaterThanOrEqualTo(propertyname='start_measure', literal='2022-01-01')
+    filter1 = PropertyIsBetween(propertyname='start_measure', lower='2022-01-01', upper='2022.12.23 07:00:00')
     #filter1 = PropertyIsBetween(propertyname='start_measure', lower='2022-11-01',upper='2022-11-02')
-    filter2 = PropertyIsLike(propertyname='id', literal='DEZ2210',wildCard='*')
+    filter2 = PropertyIsLike(propertyname='id', literal='DEZ0402',wildCard='*')
     #filters3= PropertyIsLike(propertyname='local_authority', literal='Ulm',wildCard='*')
     filters=[filter1,filter2]
 

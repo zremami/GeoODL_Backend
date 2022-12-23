@@ -8,10 +8,23 @@ def JSPRMLModel():
     data1json=getOdl_1h()
     data1norm= pd.json_normalize(data1json,"features")
     df1 = pd.DataFrame(data1norm)
+    df1['properties.start'] = pd.to_datetime(df1['properties.start']).dt.tz_localize(None)
+    df1 = df1.set_index(df1['properties.start'])
+ 
+    # to_datetime() method converts string
+    # format to a DateTime object
+    #df1.index = pd.to_datetime(df1.index)
+    
+    # dates which are not in the sequence
+    # are returned
+    #pd.date_range(start = df.TS.min(), end = df.TS.max(), freq = 'D').difference(df.TS)
+    missv=pd.date_range(start="2022-01-01 00:00:00", end="2022-12-23 06:00:00", freq = 'H').difference(df1.index)
+    print(missv.sort_values(ascending=True))
+    print(pd.DataFrame(missv).count())
 
     print(df1)
-    print(df1.sum())
-    print(df1.info())
+    #print(df1.sum())
+    #print(df1.info())
 
 
     data2json=getPrecipitation_15min()
@@ -19,19 +32,19 @@ def JSPRMLModel():
     df2 = pd.DataFrame(data2norm)
 
     df2['properties.start_measure'] = pd.to_datetime(df2['properties.start_measure']).dt.tz_localize(None)
-    df2['properties.end_measure'] = pd.to_datetime(df2['properties.start_measure']).dt.tz_localize(None)
+    df2['properties.end_measure'] = pd.to_datetime(df2['properties.end_measure']).dt.tz_localize(None)
 
-    print(df2)
-    print(df2.sum())
-    print(df2.info())
+    #print(df2.duplicated(subset=['properties.end_measure']))
+    #print(df2.sum())
+    #print(df2.info())
 
     df2 = df2.squeeze()
     df2.set_index('properties.start_measure', inplace=True)
     df2 = df2.resample('H').mean()
 
-    print(df2.sum())
     print(df2)
-    print(df2.info())
+    #print(df2.sum())
+    #print(df2.info())
 
     #ss = pd.DataFrame(df2, columns = df2['properties.value'])
     PRValueLs = np.array(df2['properties.value'])
