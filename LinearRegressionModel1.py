@@ -11,8 +11,8 @@ def LinearRegressionModel():
 
     df = JSPRMLModel()   
 
-    x= np.array(df['properties.valuePR'])
-    y= np.array(df['properties.value'])
+    x= np.array(df['PRValueLs'])
+    y= np.array(df['OLValueLs'])
 
     model = LinearRegression()
     model.fit(x.reshape((-1, 1)), y)

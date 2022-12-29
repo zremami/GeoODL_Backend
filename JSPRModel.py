@@ -5,62 +5,74 @@ def JSPRMLModel():
     import sklearn 
     from sklearn.linear_model import LinearRegression
 
+    # get odl1hr data
     data1json=getOdl_1h()
+    # serialize it to convert to data frame
     data1norm= pd.json_normalize(data1json,"features")
+    #convert to data frame
     df1 = pd.DataFrame(data1norm)
-    df1['properties.start'] = pd.to_datetime(df1['properties.start']).dt.tz_localize(None)
-    df1 = df1.set_index(df1['properties.start'])
- 
-    # to_datetime() method converts string
-    # format to a DateTime object
-    #df1.index = pd.to_datetime(df1.index)
-    
-    # dates which are not in the sequence
-    # are returned
-    #pd.date_range(start = df.TS.min(), end = df.TS.max(), freq = 'D').difference(df.TS)
-    missv=pd.date_range(start="2022-01-01 00:00:00", end="2022-12-23 06:00:00", freq = 'H').difference(df1.index)
-    print(missv.sort_values(ascending=True))
-    print(pd.DataFrame(missv).count())
+    print(df1.sum())
+    print(df1.info())
 
+    # conver to date to finde missing time stamp
+    df1['properties.start'] = pd.to_datetime(df1['properties.start']).dt.tz_localize(None)
+
+    df1 = df1.set_index(df1['properties.start'])
+    
+
+
+    # dates which are not in the sequence are returned
+    missv=pd.date_range(start="2022-01-01 00:00:00", end="2022-12-23 06:00:00", freq = 'H').difference(df1.index)
+    #print(missv.sort_values(ascending=True))
+    print(pd.DataFrame(missv).count())
+    missv = np.array(pd.to_datetime(missv.sort_values(ascending=True)))
+    print(missv)
     print(df1)
     #print(df1.sum())
     #print(df1.info())
 
-
+    # get 15min data
     data2json=getPrecipitation_15min()
+    # serilize it to make it data farame
     data2norm= pd.json_normalize(data2json,"features")
+    # convert to data farame
     df2 = pd.DataFrame(data2norm)
 
+    # conver to datetime 
     df2['properties.start_measure'] = pd.to_datetime(df2['properties.start_measure']).dt.tz_localize(None)
     df2['properties.end_measure'] = pd.to_datetime(df2['properties.end_measure']).dt.tz_localize(None)
 
-    #print(df2.duplicated(subset=['properties.end_measure']))
-    #print(df2.sum())
-    #print(df2.info())
 
+    # create a list to resample and agregate data
     df2 = df2.squeeze()
     df2.set_index('properties.start_measure', inplace=True)
+    # resample it
     df2 = df2.resample('H').mean()
 
-    print(df2)
-    #print(df2.sum())
-    #print(df2.info())
+    # drop timestamp which are missed in 1hr data frame
+    df2 = df2.drop(missv)
 
-    #ss = pd.DataFrame(df2, columns = df2['properties.value'])
+    # find null values
+    isnulldf2 = df2[df2['properties.value'].isnull()]
+    # get time stamp which are null
+    isnulldf2list = np.array(pd.to_datetime(isnulldf2.index))
+    # drop the rows in both data frames which are null in 15 min data frame
+    df2 = df2.drop(isnulldf2list)
+    df1 = df1.drop(isnulldf2list)
+
+
     PRValueLs = np.array(df2['properties.value'])
     OLValueLs = np.array(df1['properties.value'])
-    print(PRValueLs)
-    print(OLValueLs)
+    kenn = np.array(df1['properties.id'])
+
 
     df1['properties.valuePR'] = PRValueLs
-
-    #df1.insert(loc=1, column="properties.value2",  value=ss)
-
     print(df1)
 
-    combineODPR = df1[["properties.kenn","properties.start_measure", "properties.value","properties.valuePR"]]
-    print(combineODPR)
-    return combineODPR
+    combineODPR = d = {'Kenn': kenn, 'PRValueLs': PRValueLs, 'OLValueLs': OLValueLs}
+    fcombineODPR = pd.DataFrame(data=combineODPR)
+    print(fcombineODPR)
+    return fcombineODPR
 
     #df = pd.DataFrame(df, columns=['properties.start_measure', 'properties.value'])
     #display(df['properties.start_measure'].min())

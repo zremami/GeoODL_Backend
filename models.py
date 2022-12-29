@@ -1,12 +1,13 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.ext import mutable
 from flask_migrate import Migrate
 from flask import Flask,render_template,request
-from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
  
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:123456@localhost:5432/geoODLdb"
+
 
 db = SQLAlchemy()
 
@@ -32,17 +33,19 @@ class CarsModel(db.Model):
 class ODLModel(db.Model):
     __tablename__ = 'odls'
 
-    id = db.Column(db.Integer, primary_key=True)
-    kenn = db.Column(db.String())
-    value = db.Column(db.String())
-    start_measure = db.Column(db.String())
-    end_measure = db.Column(db.String())
+    ID = db.Column(db.Integer, primary_key=True)
+    Locality_code = db.Column(db.String())
+    Value = db.Column(db.String())
+    Value_e = db.Column(db.String())
+    Start_measure = db.Column(db.String())
+    End_measure = db.Column(db.String())
 
-    def __init__(self, kenn, value, start_measure, end_measure):
-        self.kenn = kenn
-        self.value = value
-        self.start_measure = start_measure
-        self.end_measure = end_measure
+    def __init__(self, Locality_code, Value, Value_e, Start_measure, End_measure):
+        self.Locality_code = Locality_code
+        self.Value = Value
+        self.Value_e = Value_e
+        self.Start_measure = Start_measure
+        self.End_measure = End_measure
 
     def __repr__(self):
         return f"{self.name}:{self.model}"
