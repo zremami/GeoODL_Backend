@@ -1,5 +1,5 @@
 def LinearRegressionModel():
-    from JSPRModel import JSPRMLModel
+    from DataFrameRep import JSPRMLModel
     import pandas as pd
     import numpy as np
     import sklearn 
@@ -11,8 +11,8 @@ def LinearRegressionModel():
 
     df = JSPRMLModel()   
 
-    x= np.array(df['PRValueLs'])
-    y= np.array(df['OLValueLs'])
+    x= np.array(df['properties.value_precipitation'])
+    y= np.array(df['properties.value_odl'])
 
     model = LinearRegression()
     model.fit(x.reshape((-1, 1)), y)

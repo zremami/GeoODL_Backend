@@ -38,7 +38,7 @@ def JSPRMLModel():
     # convert to data farame
     df2 = pd.DataFrame(data2norm)
 
-    # conver to datetime 
+    # convert to datetime 
     df2['properties.start_measure'] = pd.to_datetime(df2['properties.start_measure']).dt.tz_localize(None)
     df2['properties.end_measure'] = pd.to_datetime(df2['properties.end_measure']).dt.tz_localize(None)
 
@@ -48,6 +48,11 @@ def JSPRMLModel():
     df2.set_index('properties.start_measure', inplace=True)
     # resample it
     df2 = df2.resample('H').mean()
+
+    df2.index.join(df2.index)
+
+    print(df2)
+
 
     # drop timestamp which are missed in 1hr data frame
     df2 = df2.drop(missv)
