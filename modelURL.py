@@ -23,3 +23,18 @@ class ODL(Base):
         self.Value = Value
         self.Start_measure  = Start_measure 
         self.End_measure= End_measure
+
+class precipitation(Base):
+    __tablename__ = "precipitations"
+
+    ID = Column(Integer, primary_key=True)
+    Locality_code = Column(String)
+    Value = Column(String)
+    Start_measure = Column(String)
+    End_measure = Column(String)
+
+    def __init__(self, locality_code, value, start_measure, end_measure):
+        self.Locality_code = locality_code
+        self.Value = value
+        self.Start_measure  = start_measure 
+        self.End_measure= end_measure
