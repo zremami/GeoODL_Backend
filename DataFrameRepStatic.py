@@ -58,17 +58,19 @@ def DataFrameModelModel():
         df3 = df3.dropna()
         #print(df3)
 
-        value_odlPlus2List = []
+        value_precipitationMinus2List = []
         # i++ = (1,len(df3),2)
         for index in range(len(df3)):
-            if index == len(df3)- 2:
-                break
-            plus2=index+2
-            value_odlPlus2List.append(df3['Value_odl'][plus2])
+            #if index == len(df3)- 2:
+                #break
+            if index == 0 or index == 1 or index == 2:
+                continue
+            mines2=index-2
+            value_precipitationMinus2List.append(df3['Value_precipitation'][mines2])
             
-        df3 = df3.iloc[:-2]
+        df3 = df3.iloc[:-3]
         #value_odlPlus2array = np.array(value_odlPlus2List)
-        df3['Value_odlPlus2'] = np.array(value_odlPlus2List)
+        df3['Value_precipitationMinus2'] = np.array(value_precipitationMinus2List)
 
         #print(df3.head())
 
