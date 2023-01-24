@@ -15,7 +15,7 @@ def DataFrameModelModel():
     # get 15min data
     df1=getAllOdls()
     df1 = pd.DataFrame(df1)
-    print(df1.head())
+
     # convert to datetime 
     df1['Start_measure'] = pd.to_datetime(df1['Start_measure']).dt.tz_localize(None)
     df1['End_measure'] = pd.to_datetime(df1['End_measure']).dt.tz_localize(None)
@@ -71,6 +71,7 @@ def DataFrameModelModel():
         df3 = df3.iloc[:-3]
         #value_odlPlus2array = np.array(value_odlPlus2List)
         df3['Value_precipitationMinus2'] = np.array(value_precipitationMinus2List)
+        df3['Month'] = df3['End_measure'].dt.month 
 
         #print(df3.head())
 
@@ -79,7 +80,5 @@ def DataFrameModelModel():
         pssql_table = "odls_precipitations"
         df3.to_sql(name=pssql_table, con=connection, if_exists='append')
         #print(df3)
-
-    return df3
 
 DataFrameModelModel()
