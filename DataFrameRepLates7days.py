@@ -38,7 +38,7 @@ def DataFramelastes7daysModel(df1,df2):
 
     # drop all rows with any NaN and NaT values
     df3 = df3.dropna()
-    print(df3)
+    #print(df3)
 
     value_precipitationMinus2List = []
     # i++ = (1,len(df3),2)

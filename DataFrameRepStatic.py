@@ -12,7 +12,7 @@ def DataFrameModelModel():
     engine = db.create_engine('postgresql://postgres:123456@localhost:5432/geoODLdb')
     connection = engine.connect()
     metadata = db.MetaData()
-    # get 15min data
+    # get all odls
     df1=getAllOdls()
     df1 = pd.DataFrame(df1)
 
@@ -21,7 +21,7 @@ def DataFrameModelModel():
     df1['End_measure'] = pd.to_datetime(df1['End_measure']).dt.tz_localize(None)
     df1['Value'] = df1['Value'].astype(float)
 
-    # create a list to resample and agregate data
+    # create a list with index time 
     df1 = df1.squeeze()
     df1.set_index('Start_measure', inplace=True)
 
@@ -42,8 +42,8 @@ def DataFrameModelModel():
     
 
     data = read_csv("/home/raha/Raha/Thesis/Data/currently_active_odl_stations_selection.csv")
-    # converting column data to list
     loc_Codes = data['locality_code'].tolist()
+    # considering data for each location
     for i in loc_Codes:
         df1_locality_code = df1.loc[df1['Locality_code'] == i]
         df2_locality_code = df2.loc[df2['Locality_code'] == i]
@@ -58,17 +58,17 @@ def DataFrameModelModel():
         df3 = df3.dropna()
         #print(df3)
 
+        # create list of precipitationMinus2
         value_precipitationMinus2List = []
-        # i++ = (1,len(df3),2)
         for index in range(len(df3)):
             #if index == len(df3)- 2:
                 #break
-            if index == 0 or index == 1 or index == 2:
+            if index == 0 or index == 1:
                 continue
             mines2=index-2
             value_precipitationMinus2List.append(df3['Value_precipitation'][mines2])
             
-        df3 = df3.iloc[:-3]
+        df3 = df3.iloc[2:]
         #value_odlPlus2array = np.array(value_odlPlus2List)
         df3['Value_precipitationMinus2'] = np.array(value_precipitationMinus2List)
         df3['Month'] = df3['End_measure'].dt.month 

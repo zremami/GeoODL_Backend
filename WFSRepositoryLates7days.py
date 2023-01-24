@@ -7,39 +7,30 @@ import pandas as pd
 from IPython.display import display
 from owslib.wfs import WebFeatureService
 import webbrowser
+from urllib.request import urlopen
 
-
-
-#https://www.imis.bfs.de/ogc/opendata/ows
-#https://entw-imis.lab.bfs.de/ogc/opendata/wfs
-wfs11 = WebFeatureService(url='https://www.imis.bfs.de/ogc/opendata/ows', version='1.1.0')
 
 def getOdl_1h(locality_code):
 
-    filter = PropertyIsLike(propertyname='id', literal=locality_code,wildCard='*')
-
-    filterxml = etree.tostring(filter.toXML()).decode("utf-8")
-
-    #odlinfo_timeseries_precipitation_15min
-
-    response = wfs11.getfeature(typename='odlinfo_timeseries_odl_1h',filter = filterxml,outputFormat='application/json')
- 
-    # convert IO-byte to bytes
-    bytesD=bytes(response.read())
-    # convert to json
-    data = json.loads(bytesD)
-    return data
+    
+    url = "https://www.imis.bfs.de/ogc/opendata/wfs?typeName=opendata:odlinfo_timeseries_odl_1h&_dc=1665655122146&service=WFS&version=1.1.0&request=GetFeature&outputFormat=application%2Fjson&srsname=EPSG%3A3857&cql_filter=id%20%3D%20%27"+locality_code+"%27%20"
+        
+    # store the response of URL
+    response = urlopen(url)       
+    # storing the JSON response 
+    # from url in data
+    data_json = json.loads(response.read())
+    
+    return data_json
 
 def getPrecipitation_15min(locality_code):
 
-    filter = PropertyIsLike(propertyname='id', literal=locality_code,wildCard='*')
-    #filters3= PropertyIsLike(propertyname='local_authority', literal='Ulm',wildCard='*')
-
-    filterxml = etree.tostring(filter.toXML()).decode("utf-8")
-
-    response = wfs11.getfeature(typename='odlinfo_timeseries_precipitation_15min',filter = filterxml,outputFormat='application/json')
-    # convert IO-byte to bytes
-    bytesD=bytes(response.read())
-    # convert to json
-    data = json.loads(bytesD)
-    return data
+    url = "https://www.imis.bfs.de/ogc/opendata/wfs?typeName=opendata:odlinfo_timeseries_precipitation_15min&_dc=1665655122146&service=WFS&version=1.1.0&request=GetFeature&outputFormat=application%2Fjson&srsname=EPSG%3A3857&cql_filter=id%20%3D%20%27"+locality_code+"%27%20"
+        
+    # store the response of URL
+    response = urlopen(url)       
+    # storing the JSON response 
+    # from url in data
+    data_json = json.loads(response.read())
+    
+    return data_json

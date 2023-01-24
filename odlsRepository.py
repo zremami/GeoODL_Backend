@@ -11,6 +11,7 @@ from sqlalchemy import select
 engine = db.create_engine('postgresql://postgres:123456@localhost:5432/geoODLdb')
 connection = engine.connect()
 metadata = db.MetaData()
+
 odls = db.Table('odls', metadata, autoload=True, autoload_with=engine)
 
 
@@ -19,5 +20,5 @@ def getAllOdls():
     
     #ResultProxy = connection.execute(query)
     #ResultSet = ResultProxy.fetchall()
-    df = table_df = pd.read_sql_table( odls, con=engine)
+    df = pd.read_sql_table( odls, con=engine)
     return df
