@@ -15,7 +15,7 @@ def MultiLinearRegressionModel():
     X = df[['properties.value_precipitation', 'value_precipitationPlus2']]
     y = df['properties.value_odl']
 
-    regr = linear_model.LinearRegression()
+    regr = LinearRegression()
     regr.fit(X, y)
 
     print('Intercept: \n', regr.intercept_)

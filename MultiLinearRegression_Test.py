@@ -1,10 +1,11 @@
 from pandas import *
-def MultiLinearRegressionPrediction():
+def MultiLinearRegression_Test():
     from DataFrameRep import JSPRMLModel
     import pandas as pd
     import numpy as np
     import sklearn 
     from sklearn.linear_model import LinearRegression
+    from sklearn.metrics import mean_absolute_error as mae
     import random
     import matplotlib.pyplot as plt
     from scipy import stats
@@ -23,7 +24,7 @@ def MultiLinearRegressionPrediction():
     engine = db.create_engine('postgresql://postgres:123456@localhost:5432/geoODLdb')
     connection = engine.connect()
     metadata = db.MetaData()
-    MultiLinearRegression_Train = db.Table('MultiLinearRegression_Train2', metadata, autoload=True, autoload_with=engine)
+    MultiLinearRegression_Train = db.Table('MultiLinearRegression_Train', metadata, autoload=True, autoload_with=engine)
 
     table_df = pd.read_sql_table( MultiLinearRegression_Train, con=engine)
 
@@ -55,37 +56,36 @@ def MultiLinearRegressionPrediction():
         df_7days = DataFramelastes7daysModel(df1,df2)
         #print(df_7days.head())
         
-        x_test = df_7days[['Value_precipitation', 'Value_precipitationMinus2','Month']]
+        df7_dummies = pd.get_dummies(df_7days,columns=['Month'])
+
         y_prediction=[]
         y_real=[]
-        #y_prediction=regr.predict(x_test)
-        #print([ '%.3f' % elem for elem in y_prediction ])
+        #mae = []
         y_prediction=[]
-        #y_prediction_precipitationMultiply2=[]
-        #y_prediction_precipitationDivide2=[]
+        lat=[]
+        long=[]
+
         for index in range(len(df_7days)):
-            y_prediction.append((df_M['b0'])+(df_7days['Value_precipitation'][index])*df_M['b_Precipitation'] + (df_7days['Value_precipitationMinus2'][index])*df_M['b_PrecipitationMinus2'] + (df_7days['Month'][index])*df_M['b_Month'])
-            #y_prediction_precipitationMultiply2.append((df_M['b0'])+(df_7days['Value_precipitation'][index]*2)*df_M['b_Precipitation'] + (df_7days['Value_precipitationMinus2'][index]*2)*df_M['b_PrecipitationMinus2'] + (df_7days['Month'][index])*df_M['b_Month'])
-            #y_prediction_precipitationDivide2.append((df_M['b0'])+(df_7days['Value_precipitation'][index]*1/2)*df_M['b_Precipitation'] + (df_7days['Value_precipitationMinus2'][index]*1/2)*df_M['b_PrecipitationMinus2'] + (df_7days['Month'][index])*df_M['b_Month'])
-        #print([ '%.3f' % elem for elem in y_prediction2 ])
+            y_prediction.append((df_M['b0'])+(df7_dummies['Value_precipitation'][index])*df_M['b_Precipitation'] + (df7_dummies['Value_precipitationMinus2'][index])*df_M['b_PrecipitationMinus2'] + (df7_dummies['Month_2'][index])*df_M['b_Month2'])
+            lat.append(df_M['longitude'])
+            long.append(df_M['longitude'])
 
         y_prediction=np.array(y_prediction)
-        #y_prediction_precipitationMultiply2=np.array(y_prediction_precipitationMultiply2)
-        #y_prediction_precipitationDivide2=np.array(y_prediction_precipitationDivide2)
-        y_real = np.array(df_7days['Value_odl'])
-        #print(df_7days['Value_odl'])
-        #print (y_prediction)
+        y_real = np.array(df7_dummies['Value_odl'])
+        meanAE = mae(y_real,y_prediction)
+        #print(meanAE)
         df_final = pd.DataFrame()
-        df_final['Locality_code']= np.array(df_7days['Locality_code'])
+        df_final['Locality_code']= np.array(df7_dummies['Locality_code'])
         df_final['Start_measure']= np.array(df_7days.index)
         df_final['precipitation'] = np.array(df_7days['Value_precipitation'])
         df_final['y_ODL_real'] = y_real
         df_final['y_ODL_prediction'] = y_prediction
-        #df_final['y_prediction_precipitationMultiply2'] = y_prediction_precipitationMultiply2
-        #df_final['y_prediction_precipitationDivide2'] = y_prediction_precipitationDivide2
         #df_final['difference_real_Prediction']= ['%.10f' % elem for elem in y_real - y_prediction]
+        df_final['mean absolute error']= meanAE
+        df_final['latitude']= np.array(lat)
+        df_final['longitude']= np.array(long)
 
-        pssql_table = "MultiLinearRegression_Test4"
+        pssql_table = "MultiLinearRegression_Test"
         df_final.to_sql(name=pssql_table, con=connection, if_exists='append',index=False)
  
-MultiLinearRegressionPrediction()
+MultiLinearRegression_Test()

@@ -1,5 +1,5 @@
 from pandas import *
-def MultiLinearRegressionStaticModel():
+def MultiLinearRegressionStatiConvertCategoricaltoNummy():
     import pandas as pd
     import numpy as np
     import sklearn 
@@ -30,10 +30,18 @@ def MultiLinearRegressionStaticModel():
         df_locality= table_df.loc[table_df['Locality_code']== i]
         if df_locality.empty:
             continue
-        x = df_locality[['Value_precipitation', 'Value_precipitationMinus2','Month']]
+
+        df_dummies = pd.get_dummies(df_locality,columns=['Month'])
+        df_locality[['Month_1','Month_2','Month_3','Month_4','Month_5','Month_6','Month_7','Month_8','Month_9','Month_10','Month_11','Month_12']] = df_dummies[['Month_1','Month_2','Month_3','Month_4','Month_5','Month_6','Month_7','Month_8','Month_9','Month_10','Month_11','Month_12']].astype(int)
+
+        print(df_locality.head())
+        print(df_locality.info())
+        x = df_locality[['Value_precipitation', 'Value_precipitationMinus2','Month_1','Month_2','Month_3','Month_4','Month_5','Month_6','Month_7','Month_8','Month_9','Month_10','Month_11','Month_12']]
+        
+
         y = df_locality['Value_odl']
-        print(x)
         print(y)
+        x.columns = x.columns.astype(str)
         regr = linear_model.LinearRegression()
         regr.fit(x, y)
 
@@ -41,6 +49,16 @@ def MultiLinearRegressionStaticModel():
         print('R-s: \n', regr.score(x, y))
         print('Intercept: \n', regr.intercept_.astype(float))
         print('Coefficients: \n', regr.coef_)
+
+        # with statsmodels
+        x = sm.add_constant(x) # adding a constant
+        
+        model = sm.OLS(y, x).fit()
+        predictions = model.predict(x) 
+        
+        print_model = model.summary()
+        print(print_model)
+
         coefArray = np.array(regr.coef_)
         df_M['Locality_code']=[str(i)]
         df_M['R-squared']=[regr.score(x, y)]
@@ -106,4 +124,4 @@ def MultiLinearRegressionStaticModel():
         pssql_table = "MultiLinearRegression_Test"
         df_final.to_sql(name=pssql_table, con=connection, if_exists='append',index=False)
  
-MultiLinearRegressionStaticModel()
+MultiLinearRegressionStatiConvertCategoricaltoNummy()

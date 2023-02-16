@@ -32,22 +32,21 @@ def MultiLinearRegressionStaticModel():
             continue
         x = df_locality[['Value_precipitation', 'Value_precipitationMinus2','Month']]
         y = df_locality['Value_odl']
-        print(x)
-        print(y)
+
         regr = linear_model.LinearRegression()
         regr.fit(x, y)
 
         #model = LinearRegression(fit_intercept=False).fit(x, y)
-        print('R-s: \n', regr.score(x, y))
-        print('Intercept: \n', regr.intercept_.astype(float))
-        print('Coefficients: \n', regr.coef_)
-        coefArray = np.array(regr.coef_)
-        df_M['Locality_code']=[str(i)]
-        df_M['R-squared']=[regr.score(x, y)]
-        df_M['b0'] = [regr.intercept_.astype(float)]
-        df_M['b_Precipitation']=[coefArray[0]]
-        df_M['b_PrecipitationMinus2']=[coefArray[1]]
-        df_M['b_Month']=[coefArray[2]]
+        #print('R-s: \n', regr.score(x, y))
+        #print('Intercept: \n', regr.intercept_.astype(float))
+        #print('Coefficients: \n', regr.coef_)
+        #coefArray = np.array(regr.coef_)
+        #df_M['Locality_code']=[str(i)]
+        #df_M['R-squared']=[regr.score(x, y)]
+        #df_M['b0'] = [regr.intercept_.astype(float)]
+        #df_M['b_Precipitation']=[coefArray[0]]
+        #df_M['b_PrecipitationMinus2']=[coefArray[1]]
+        #df_M['b_Month']=[coefArray[2]]
 
         #pssql_table = "MultiLinearRegression_Train"
         #df_M.to_sql(name=pssql_table, con=connection, if_exists='append',index=False)
@@ -87,10 +86,10 @@ def MultiLinearRegressionStaticModel():
         y_prediction=np.array(regr.predict(x_test))
         #print(y_prediction)
 
-        #y_prediction2=[]
-        #for index in range(len(df_7days)):
-        #y_prediction2.append(df_M['b0']+df_7days['Value_precipitation'][index]*df_M['b_Precipitation'] + df_7days['Value_precipitationMinus2'][index]*df_M['b_PrecipitationMinus2'] + + df_7days['Month'][index]*df_M['b_Month'])
-        #print(np.array(y_prediction2))
+        y_prediction_average=[]
+        for index in range(len(df_7days)):
+            y_prediction_average.append(0.0861636378610522 + df_7days['Value_precipitation'][index]* 0.00232850191229519 + df_7days['Value_precipitationMinus2'][index]* 0.00156424534889735 + df_7days['Month'][index]* 0.000253739585852942)
+        y_prediction_average = np.array(y_prediction_average)
 
         y_real = np.array(df_7days['Value_odl'])
         #print(df_7days['Value_odl'])
@@ -101,7 +100,9 @@ def MultiLinearRegressionStaticModel():
         df_final['precipitation'] = np.array(df_7days['Value_precipitation'])
         df_final['y_ODL_real'] = y_real
         df_final['y_ODL_prediction'] = y_prediction
+        df_final['y_ODL_prediction_average'] = y_prediction_average
         df_final['difference_real_Prediction']= ['%.10f' % elem for elem in y_real - y_prediction]
+        df_final['difference_real_Prediction_Average']= ['%.10f' % elem for elem in y_real - y_prediction_average]
 
         pssql_table = "MultiLinearRegression_Test"
         df_final.to_sql(name=pssql_table, con=connection, if_exists='append',index=False)
