@@ -11,7 +11,7 @@ from pathlib import Path
 from pandas_geojson import to_geojson
 import json  
 
-def ConverttoGeojson():
+def ConverttoGeojson(locality_code[], latitude[],longitude):
 
     dataCoordinate = read_csv("/home/raha/Raha/Thesis/Data/BaseMap.csv")
     # converting column data to list
