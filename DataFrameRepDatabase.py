@@ -1,6 +1,6 @@
 from pandas import *
 def DataFrameModelModel():
-    from WFSRepository import getOdl_1h, getPrecipitation_15min
+    from WFSOWSLibRepository import getOdl_1h, getPrecipitation_15min
     from precipitationsRepository import getAllprecipitations
     from odlsRepository import getAllOdls
     import pandas as pd

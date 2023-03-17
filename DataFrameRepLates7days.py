@@ -1,9 +1,4 @@
 from pandas import *
-from WFSRepository import getOdl_1h, getPrecipitation_15min
-from precipitationsRepository import getAllprecipitations
-from odlsRepository import getAllOdls
-import pandas as pd
-import pandas as pd
 import pandas as pd
 import numpy as np
 import sqlalchemy as db

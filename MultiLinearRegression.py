@@ -1,5 +1,5 @@
 def MultiLinearRegressionModel():
-    from DataFrameRep import JSPRMLModel
+    from DataFrameRepFly import JSPRMLModel
     import pandas as pd
     import numpy as np
     import sklearn 

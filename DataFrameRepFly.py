@@ -1,5 +1,5 @@
 def JSPRMLModel():
-    from WFSRepository import getOdl_1h, getPrecipitation_15min
+    from WFSOWSLibRepository import getOdl_1h, getPrecipitation_15min
     import pandas as pd
     import numpy as np
     import sklearn 

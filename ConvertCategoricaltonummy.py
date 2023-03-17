@@ -12,7 +12,7 @@ def MultiLinearRegressionStatiConvertCategoricaltoNummy():
     import sqlalchemy as db
     from sqlalchemy.orm import Session
     from sqlalchemy import select
-    from WFSRepositoryLates7days import getOdl_1h,getPrecipitation_15min
+    from WFSURLRepositoryLates7days import getOdl_1h,getPrecipitation_15min
     from DataFrameRepLates7days import DataFramelastes7daysModel
 
     engine = db.create_engine('postgresql://postgres:123456@localhost:5432/geoODLdb')

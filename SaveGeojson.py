@@ -4,7 +4,7 @@
 from pandas import *
 import pandas as pd
 import sqlalchemy as db
-from modelURL import ODL, precipitation
+from models import ODL, precipitation
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from pathlib import Path

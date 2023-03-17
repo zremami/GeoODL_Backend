@@ -1,6 +1,6 @@
 from pandas import *
 def MultiLinearRegressionPrediction():
-    from DataFrameRep import JSPRMLModel
+    from DataFrameRepFly import JSPRMLModel
     import pandas as pd
     import numpy as np
     import sklearn 
@@ -12,10 +12,10 @@ def MultiLinearRegressionPrediction():
     from sklearn import linear_model
     import pandas as pd
     import sqlalchemy as db
-    from modelURL import ODL, precipitation
+    from models import ODL, precipitation
     from sqlalchemy.orm import Session
     from sqlalchemy import select
-    from WFSRepositoryLates7days import getOdl_1h,getPrecipitation_15min
+    from WFSURLRepositoryLates7days import getOdl_1h,getPrecipitation_15min
     from DataFrameRepLates7days import DataFramelastes7daysModel
     from pathlib import Path  
     

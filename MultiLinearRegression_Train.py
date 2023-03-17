@@ -12,7 +12,7 @@ def MultiLinearRegressionTrain():
     import sqlalchemy as db
     from sqlalchemy.orm import Session
     from sqlalchemy import select
-    from WFSRepositoryLates7days import getOdl_1h,getPrecipitation_15min
+    from WFSURLRepositoryLates7days import getOdl_1h,getPrecipitation_15min
     from DataFrameRepLates7days import DataFramelastes7daysModel
 
     engine = db.create_engine('postgresql://postgres:123456@localhost:5432/geoODLdb')
@@ -21,15 +21,15 @@ def MultiLinearRegressionTrain():
     odls_precipitations = db.Table('odls_precipitations', metadata, autoload=True, autoload_with=engine)
 
     table_df =pd.read_sql_table( odls_precipitations, con=engine)
-    dataCoordinate = read_csv("/home/raha/Raha/Thesis/Data/odl_sondenstandorte.csv")
-    dfCoordinate= pd.DataFrame(dataCoordinate)
+    sondenstandorte = read_csv("/home/raha/Raha/Thesis/Data/odl_sondenstandorte.csv")
+    df_sondenstandorte= pd.DataFrame(sondenstandorte)
     data = read_csv("/home/raha/Raha/Thesis/Data/currently_active_odl_stations_selection.csv")
     # converting column data to list
     loc_Codes = data['locality_code'].tolist()
     for i in loc_Codes:
         df_M = pd.DataFrame()
         df_locality= table_df.loc[table_df['Locality_code']== i]
-        df_coordinate = dfCoordinate.loc[dfCoordinate['locality_code']== i]
+        df_sondenstandorte_l_code = df_sondenstandorte.loc[df_sondenstandorte['locality_code']== i]
         #df_merge = df_locality.set_index('Locality_code').join(dfCoordinate.set_index('locality_code'))
         if df_locality.empty:
             continue
@@ -55,10 +55,11 @@ def MultiLinearRegressionTrain():
         #print('Coefficients: \n', np.array(model.coef_))
         coefArray = np.array(model.coef_.astype(float))
         df_M['Locality_code']=[str(i)]
-        df_M['R-squared']=[model.score(x, y)]
+        df_M['Locality_name']=np.array(df_sondenstandorte_l_code['locality_name'])
+        df_M['R_squared']=[model.score(x, y)]
         x = sm.add_constant(x) # adding a constant       
         model2 = sm.OLS(y, x).fit()
-        df_M['R-squared_adjusted']=[model2.rsquared_adj]
+        df_M['R_squared_adjusted']=[model2.rsquared_adj]
         df_M['b0'] = [model.intercept_.astype(float)]
         df_M['b_Precipitation']=[coefArray[0]]
         df_M['b_PrecipitationMinus2']=[coefArray[1]]
@@ -74,8 +75,8 @@ def MultiLinearRegressionTrain():
         df_M['b_Month10']=[coefArray[11]]
         df_M['b_Month11']=[coefArray[12]]
         df_M['b_Month12']=[coefArray[13]]
-        df_M['latitude']=np.array(df_coordinate['latitude'])
-        df_M['longitude']=np.array(df_coordinate['longitude'])
+        df_M['latitude']=np.array(df_sondenstandorte_l_code['latitude'])
+        df_M['longitude']=np.array(df_sondenstandorte_l_code['longitude'])
         
         #print(df_M.head())
         pssql_table = "MultiLinearRegression_Train"

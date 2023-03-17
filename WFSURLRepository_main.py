@@ -6,9 +6,9 @@ from pandas import *
 import pandas as pd
 # import json
 import json
-from models import db,ODLModel
+from models_Flaks import db,ODLModel
 import sqlalchemy as db
-from modelURL import ODL, precipitation
+from models import ODL, precipitation
 
 from sqlalchemy.orm import Session
 

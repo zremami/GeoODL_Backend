@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask import Flask,render_template,request
-from models import db,app,CarsModel,ODLModel, PrecipitationModel,BasemapModel
+from models_Flaks import db,app,CarsModel,ODLModel, PrecipitationModel,BasemapModel
 from MultiLinearRegression_Test import MultiLinearRegression_Test
 import pandas as pd
 import numpy as np
