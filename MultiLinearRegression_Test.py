@@ -126,13 +126,19 @@ def MultiLinearRegression_Test(locality_code):
     bad_result=[]
     bad_result_string=[]
     for row in odl_predict_10head_sorted.index:
-        slop = df_final.loc[row,'odl_real'] - df_final.loc[row-1,'odl_real']
+        if row == 0:
+            continue
+        slop_odl_real = df_final.loc[row,'odl_real'] - df_final.loc[row-1,'odl_real']
+        slop_odl_prediction = df_final.loc[row,'odl_prediction'] - df_final.loc[row-1,'odl_prediction']
         endMeasureTimestamp = odl_predict_10head.loc[row,'end_measure']
 
-        if slop > 0:
+        if slop_odl_real > 0 and  slop_odl_prediction >0:
             good_result.append(endMeasureTimestamp)
             good_result_string.append(datetime.fromtimestamp(endMeasureTimestamp).strftime("%d-%m-%Y %H:%M:%S"))
-        else:
+        elif slop_odl_real < 0  and slop_odl_prediction > 0:
+            bad_result.append(endMeasureTimestamp)
+            bad_result_string.append(datetime.fromtimestamp(endMeasureTimestamp).strftime("%d-%m-%Y %H:%M:%S"))
+        elif slop_odl_real > 0  and slop_odl_prediction < 0:
             bad_result.append(endMeasureTimestamp)
             bad_result_string.append(datetime.fromtimestamp(endMeasureTimestamp).strftime("%d-%m-%Y %H:%M:%S"))
 
@@ -164,8 +170,8 @@ def MultiLinearRegression_Test(locality_code):
     message = ''
     message += 'This is a chart showing the real and predicted value of ODL and precipitation in the latest 7 days in {0}.'
     message += 'There is a boundary around the real value that can show you where the predicted values are not in a range of real values which means the model does not predict very accurately.'
-    message += 'ALso by comparing the slope of predicted and real value we can see how well the model works. For example, in these points {1} you can see while the predicted values are increasing the actual values are decreasing which is not good.'
-    message += 'On the other hand, you can see in these points {2} the model works well as the predicted values increasing the actual values are increasing too.'
+    message += ' Also by comparing the slope of predicted and real value we can see how well the model works. For example, in these points {1} ,as you can see in red dotted lines, while the predicted values are increasing or decreasing the real values are following the opposite direction.'
+    message += 'On the other hand, by looking on green dotted lines, in these points {2} the model works well as the predicted and real values following the same pattern in increasing the slope.'
     message += 'Here you may see that there is precipitation which can prove this hypothesis that the increase in ODL is because of an increase in precipitation.'
     message = message.format(prediction.localityName, ', '.join(bad_result_string), ', '.join(good_result_string))
     prediction.message = message
