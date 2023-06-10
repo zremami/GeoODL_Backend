@@ -19,11 +19,11 @@ migrate = Migrate(app, db)
 
 
 class BasemapModel(db.Model):
-    __tablename__ = 'MultiLinearRegression_Train'
+    __tablename__ = 'PMultiLinearRegression_Trained'
 
     Locality_code = db.Column(db.String(), primary_key=True)
-    R_squared = db.Column(db.Float())
-    R_squared_adjusted = db.Column(db.Float())
+    #R_squared = db.Column(db.Float())
+    #R_squared_adjusted = db.Column(db.Float())
     b0 = db.Column(db.Float())
     b_Precipitation = db.Column(db.Float())
     b_PrecipitationMinus2 = db.Column(db.Float())

@@ -4,9 +4,7 @@
 from pandas import *
 import pandas as pd
 import sqlalchemy as db
-from modelURL import ODL, precipitation
-from sqlalchemy.orm import Session
-from sqlalchemy import select
+
 
 engine = db.create_engine('postgresql://postgres:123456@localhost:5432/geoODLdb')
 connection = engine.connect()
@@ -21,4 +19,5 @@ def getAllOdls():
     #ResultProxy = connection.execute(query)
     #ResultSet = ResultProxy.fetchall()
     df = pd.read_sql_table( odls, con=engine)
-    return df
+    print(df.head())
+getAllOdls()

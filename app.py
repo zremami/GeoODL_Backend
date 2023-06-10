@@ -92,10 +92,10 @@ def handle_getallODL(locality_code):
 if __name__ == '__main__':
     app.run(debug=True)
 
-@app.route('/prediction/<locality_code>/', methods=['GET'])
-def handle_linearRegressionTest(locality_code):
+@app.route('/prediction/<locality_code>/<started>/<ended>', methods=['GET'])
+def handle_linearRegressionTest(locality_code,started,ended):
     if request.method == 'GET':
         # store the response of URL
-        response = MultiLinearRegression_Test(locality_code)
+        response = MultiLinearRegression_Test(locality_code,started,ended)
 
         return (response)

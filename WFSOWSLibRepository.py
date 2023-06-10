@@ -18,7 +18,8 @@ currdate = datetime.date.today()
 
 def getOdl_1h():
     #filter1 = PropertyIsGreaterThanOrEqualTo(propertyname='start', literal='2022-01-01')
-    filter1 = PropertyIsBetween(propertyname='start', lower='2022-01-01' ,upper= str(prevdate) + ' 23:00:00')
+    #filter1 = PropertyIsBetween(propertyname='start', lower='2021-01-01' ,upper= str(prevdate) + ' 23:00:00')
+    filter1 = PropertyIsBetween(propertyname='start', lower='2021-01-01' ,upper= '2022-12-30')
     #filter1 = PropertyIsBetween(propertyname='start_measure', lower='2022-11-01',upper='2022-11-02')
     filter2 = PropertyIsLike(propertyname='id', literal='DEZ0402',wildCard='*')
     #filter3 = PropertyIsLike(propertyname='network', literal='BfS',wildCard='*')
@@ -44,7 +45,7 @@ def getOdl_1h():
 def getPrecipitation_15min():
 
     #filter1 = PropertyIsGreaterThanOrEqualTo(propertyname='start_measure', literal='2022-01-01')
-    filter1 = PropertyIsBetween(propertyname='start_measure', lower='2022-01-01', upper= currdate)
+    filter1 = PropertyIsBetween(propertyname='start_measure', lower='2023-01-01', upper= currdate)
     #filter1 = PropertyIsBetween(propertyname='start_measure', lower='2022-11-01',upper='2022-11-02')
     filter2 = PropertyIsLike(propertyname='id', literal='DEZ0402',wildCard='*')
     #filters3= PropertyIsLike(propertyname='local_authority', literal='Ulm',wildCard='*')

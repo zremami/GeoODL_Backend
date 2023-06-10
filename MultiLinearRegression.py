@@ -29,4 +29,5 @@ def MultiLinearRegressionModel():
     
     print_model = model.summary()
     print(print_model)
+    
 MultiLinearRegressionModel()

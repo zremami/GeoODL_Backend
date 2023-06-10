@@ -12,15 +12,15 @@ import sqlalchemy as db
 from models import ODL, precipitation
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from WFSURLRepositoryLates7days import getOdl_1h,getPrecipitation_15min
-from DataFrameRepLates7days import DataFramelastes7daysModel
+from WFSURLRepository7days import getOdl_1h,getPrecipitation_15min
+from DataFrame7days import DataFrame7daysModel
 from pathlib import Path
 import json
 import statistics
 from dtos import predictionDTO 
 from datetime import datetime
 
-def MultiLinearRegression_Test(locality_code):
+def MultiLinearRegression_Test(locality_code,start,end):
 
     #connect to database
     engine = db.create_engine('postgresql://postgres:123456@localhost:5432/geoODLdb')
@@ -38,18 +38,18 @@ def MultiLinearRegression_Test(locality_code):
     df_M= df.loc[df['Locality_code']== locality_code]
 
     # get 1h_odl 7days data test
-    data_json1=getOdl_1h(locality_code)
+    data_json1=getOdl_1h(locality_code,start,end)
     datanorm1= pd.json_normalize(data_json1,"features")
     df1 = pd.DataFrame(datanorm1)
     if df1.empty:
         return 0
     # change the name of the columns
-    df1 = df1[['properties.id','properties.start_measure','properties.end_measure','properties.value']]
+    df1 = df1[['properties.id','properties.start','properties.end_measure','properties.value']]
     df1.columns = ['Locality_code', 'Start_measure','End_measure','Value']
     #print(df1.info())
 
     # get 15_min 7days data set
-    data_json2=getPrecipitation_15min(locality_code)
+    data_json2=getPrecipitation_15min(locality_code,start,end)
     datanorm2= pd.json_normalize(data_json2,"features")
     df2 = pd.DataFrame(datanorm2)
 
@@ -62,7 +62,7 @@ def MultiLinearRegression_Test(locality_code):
     #print(df2.info())
 
     # create the dataset resampled 15min and joined with 1h odl
-    df_7days = DataFramelastes7daysModel(df1,df2)
+    df_7days = DataFrame7daysModel(df1,df2)
 
     #df_20days.groupby(pd.Grouper(freq='M'))
     #grouped = df_20days.groupby('Month') 
@@ -138,9 +138,6 @@ def MultiLinearRegression_Test(locality_code):
         elif slop_odl_real < 0  and slop_odl_prediction > 0:
             bad_result.append(endMeasureTimestamp)
             bad_result_string.append(datetime.fromtimestamp(endMeasureTimestamp).strftime("%d-%m-%Y %H:%M:%S"))
-        elif slop_odl_real > 0  and slop_odl_prediction < 0:
-            bad_result.append(endMeasureTimestamp)
-            bad_result_string.append(datetime.fromtimestamp(endMeasureTimestamp).strftime("%d-%m-%Y %H:%M:%S"))
 
 
     #print("we can see in these days",good_result ,"the model works well")
@@ -170,7 +167,7 @@ def MultiLinearRegression_Test(locality_code):
     message = ''
     message += 'This is a chart showing the real and predicted value of ODL and precipitation in the latest 7 days in {0}.'
     message += 'There is a boundary around the real value that can show you where the predicted values are not in a range of real values which means the model does not predict very accurately.'
-    message += ' Also by comparing the slope of predicted and real value we can see how well the model works. For example, in these points {1} ,as you can see in red dotted lines, while the predicted values are increasing or decreasing the real values are following the opposite direction.'
+    message += ' Also by comparing the slope of predicted and real value we can see how well the model works. For example, in these points {1} ,as you can see in red dotted lines, while the predicted values are increasing the real values are following the opposite direction.'
     message += 'On the other hand, by looking on green dotted lines, in these points {2} the model works well as the predicted and real values following the same pattern in increasing the slope.'
     message += 'Here you may see that there is precipitation which can prove this hypothesis that the increase in ODL is because of an increase in precipitation.'
     message = message.format(prediction.localityName, ', '.join(bad_result_string), ', '.join(good_result_string))
