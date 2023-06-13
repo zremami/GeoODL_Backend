@@ -59,6 +59,8 @@ def Show_basemap():
             "type": "Feature",
             "properties": {
                 "Locality_code": basemap.Locality_code,
+                "Locality_name": basemap.Locality_name,
+                "Geometry": [basemap.latitude, basemap.longitude],
             },
             "geometry": {
                 "type": "Point",
@@ -92,10 +94,10 @@ def handle_getallODL(locality_code):
 if __name__ == '__main__':
     app.run(debug=True)
 
-@app.route('/prediction/<locality_code>/<started>/<ended>', methods=['GET'])
-def handle_linearRegressionTest(locality_code,started,ended):
+@app.route('/prediction/<locality_code>/<started>/<ended>/<effect>', methods=['GET'])
+def handle_linearRegressionTest(locality_code, started, ended, effect):
     if request.method == 'GET':
         # store the response of URL
-        response = MultiLinearRegression_Test(locality_code,started,ended)
+        response = MultiLinearRegression_Test(locality_code, started, ended, effect)
 
         return (response)

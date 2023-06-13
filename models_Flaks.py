@@ -22,6 +22,7 @@ class BasemapModel(db.Model):
     __tablename__ = 'PMultiLinearRegression_Trained'
 
     Locality_code = db.Column(db.String(), primary_key=True)
+    Locality_name = db.Column(db.String())
     #R_squared = db.Column(db.Float())
     #R_squared_adjusted = db.Column(db.Float())
     b0 = db.Column(db.Float())
@@ -42,8 +43,9 @@ class BasemapModel(db.Model):
     latitude = db.Column(db.Float())
     longitude = db.Column(db.Float())
 
-    def __init__(self, Locality_code,R_squared,R_squared_adjusted,b0,b_Precipitation,b_PrecipitationMinus2,b_Month1,b_Month2,b_Month3,b_Month4,b_Month5,b_Month6,b_Month7,b_Month8,b_Month9,b_Month10,b_Month11,b_Month12, latitude, longitude):
+    def __init__(self, Locality_code, Locality_name,R_squared,R_squared_adjusted,b0,b_Precipitation,b_PrecipitationMinus2,b_Month1,b_Month2,b_Month3,b_Month4,b_Month5,b_Month6,b_Month7,b_Month8,b_Month9,b_Month10,b_Month11,b_Month12, latitude, longitude):
         self.Locality_code = Locality_code
+        self.Locality_name = Locality_name
         self.R_squared =R_squared
         self.R_squared_adjusted = R_squared_adjusted
         self.b0 = b0
