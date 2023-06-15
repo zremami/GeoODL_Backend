@@ -1,10 +1,6 @@
-from flask import Flask
-from owslib.fes import *
 import datetime
-import xml.dom.minidom # WFS returns GML - this library is used to parse it
 import json
 import pandas as pd
-from IPython.display import display
 import webbrowser
 from urllib.request import urlopen
 

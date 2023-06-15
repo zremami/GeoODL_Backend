@@ -1,26 +1,16 @@
 from pandas import *
 import pandas as pd
 import numpy as np
-import sklearn 
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error as mae
-import random
-from scipy import stats
-import statsmodels.api as sm
-from sklearn import linear_model
 import sqlalchemy as db
-from models import ODL, precipitation
 from sqlalchemy.orm import Session
-from sqlalchemy import select
 from WFSURLRepository7days import getOdl_1h,getPrecipitation_15min
 from DataFrame7days import DataFrame7daysModel
-from pathlib import Path
 import json
 import statistics
 from dtos import predictionDTO 
 from datetime import datetime
 
-def MultiLinearRegression_Test(locality_code,start,end, effect):
+def MultiLinearRegression_Test(locality_code,start,end, effect, effect2):
 
     #connect to database
     engine = db.create_engine('postgresql://postgres:123456@localhost:5432/geoODLdb')
@@ -33,6 +23,7 @@ def MultiLinearRegression_Test(locality_code,start,end, effect):
 
     # converting  MultiLinearRegression_Train table to dataframe
     df= pd.DataFrame(table_df)
+    prediction = predictionDTO.predictionDTO()
 
     # MultiLinearRegression_Train dataframe with a given locality_code
     df_M= df.loc[df['Locality_code']== locality_code]
@@ -41,8 +32,15 @@ def MultiLinearRegression_Test(locality_code,start,end, effect):
     data_json1=getOdl_1h(locality_code,start,end)
     datanorm1= pd.json_normalize(data_json1,"features")
     df1 = pd.DataFrame(datanorm1)
+
     if df1.empty:
-        return 0
+        #message = ''
+        #message += 'Please choose another date'
+        #prediction.message = message
+        jsonResult = json.loads(prediction.toJSON())
+        return jsonResult
+
+
     # change the name of the columns
     df1 = df1[['properties.id','properties.start','properties.end_measure','properties.value']]
     df1.columns = ['Locality_code', 'Start_measure','End_measure','Value']
@@ -54,7 +52,11 @@ def MultiLinearRegression_Test(locality_code,start,end, effect):
     df2 = pd.DataFrame(datanorm2)
 
     if df2.empty:
-        return 0
+        #message = ''
+        #message += 'Please choose another date'
+        #prediction.message = message
+        jsonResult = json.loads(prediction.toJSON())
+        return jsonResult
 
     # change the name of the columns
     df2 = df2[['properties.id','properties.start_measure','properties.end_measure','properties.value']]
@@ -81,7 +83,7 @@ def MultiLinearRegression_Test(locality_code,start,end, effect):
         b_month_string = 'b_Month' + str(df7_dummies['Month_'][index])
         append_odl = float(
             df_M['b0'] + #b0
-            (df_M['b_Precipitation'] * df_7days['Value_precipitation'][index]) * float(effect) + #b1x1
+            (df_M['b_Precipitation'] * df_7days['Value_precipitation'][index]) * float(effect2) + #b1x1
             (df_M['b_PrecipitationMinus2'] * df_7days['Value_precipitationMinus2'][index]) * float(effect) + #b2x2
             (df_M[b_month_string] * 1) #b3x3
         )
@@ -89,7 +91,7 @@ def MultiLinearRegression_Test(locality_code,start,end, effect):
 
 
     y_real = np.array(df_7days['Value_odl'])
-    meanAE = mae(y_real,y_prediction)
+    #meanAE = mae(y_real,y_prediction)
     
     df_7days['end_measure'] = list(map(lambda x: x / 1000000000, df_7days['End_measure'].values.astype(Int32Dtype)))
     #print(np.array(df_7days['End_measure']))
@@ -104,18 +106,18 @@ def MultiLinearRegression_Test(locality_code,start,end, effect):
     df_final['difference_real_Prediction']= ['%.10f' % elem for elem in y_real - y_prediction]
     df_final['absolute_percent_error']= [elem for elem in (abs(y_real - y_prediction)  / abs(y_real)) * 100]
 
-    mape = np.mean(df_final['absolute_percent_error'])
+    #mape = np.mean(df_final['absolute_percent_error'])
 
-    y_prediction_evaluate=[]
+    '''y_prediction_evaluate=[]
     for index in range(len(y_real)):
         y_prediction_evaluate.append('out of range' if abs(y_real[index] - y_prediction[index]) > meanAE else 'in range')
 
-    df_final['evaluate_prediction']= y_prediction_evaluate
+    df_final['evaluate_prediction']= y_prediction_evaluate'''
 
     mean_y_real = np.mean(y_real)
     STDV_y_real= np.std(y_real)
 
-    out_range_result = df_final[(df_final['evaluate_prediction'] == "out of range")] 
+    #out_range_result = df_final[(df_final['evaluate_prediction'] == "out of range")] 
 
     odl_predict_sorted = df_final.sort_values('odl_prediction', ascending=False)
     odl_predict_10head = odl_predict_sorted.head(10)
@@ -153,25 +155,26 @@ def MultiLinearRegression_Test(locality_code,start,end, effect):
     #badResultString = json.dumps(bad_result)
     #print(df_M.index[0])
 
-    prediction = predictionDTO.predictionDTO()
+
     prediction.localityCode = locality_code
     prediction.localityName = df_M.loc[df_M.index[0],'Locality_name']
     prediction.stdRealValue = 2*STDV_y_real
     prediction.meanRealValue = mean_y_real
-    prediction.mape = mape
-    prediction.meanAbsoluteError = meanAE
+    #prediction.mape = mape
+    #prediction.meanAbsoluteError = meanAE
     prediction.result = result
     prediction.goodPoints = good_result
     prediction.badPoints = bad_result
 
-    message = ''
-    message += 'This is a chart showing the real and predicted value of ODL and precipitation in the latest 7 days in {0}.'
-    message += 'There is a boundary around the real value that can show you where the predicted values are not in a range of real values which means the model does not predict very accurately.'
-    message += ' Also by comparing the slope of predicted and real value we can see how well the model works. For example, in these points {1} ,as you can see in red dotted lines, while the predicted values are increasing the real values are following the opposite direction.'
-    message += 'On the other hand, by looking on green dotted lines, in these points {2} the model works well as the predicted and real values following the same pattern in increasing the slope.'
-    message += 'Here you may see that there is precipitation which can prove this hypothesis that the increase in ODL is because of an increase in precipitation.'
-    message = message.format(prediction.localityName, ', '.join(bad_result_string), ', '.join(good_result_string))
-    prediction.message = message
+    #message = ''
+    #message += 'Please choose another date'
+    #'''message += 'This is a chart showing the real and predicted value of ODL and precipitation in the latest 7 days in {0}.'
+    #message += 'There is a boundary around the real value that can show you where the predicted values are not in a range of real values which means the model does not predict very accurately.'
+    #message += ' Also by comparing the slope of predicted and real value we can see how well the model works. For example, in these points {1} ,as you can see in red dotted lines, while the predicted values are increasing the real values are following the opposite direction.'
+    #message += 'On the other hand, by looking on green dotted lines, in these points {2} the model works well as the predicted and real values following the same pattern in increasing the slope.'
+    #message += 'Here you may see that there is precipitation which can prove this hypothesis that the increase in ODL is because of an increase in precipitation.'''
+    #message = message.format(prediction.localityName, ', '.join(bad_result_string), ', '.join(good_result_string))
+    #prediction.message = message
 
     #df_final['mae_evaluate']= ['%.10f' % elem for elem in meanAE - (y_prediction - y_real)]
 
