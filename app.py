@@ -1,9 +1,9 @@
 from flask import request
 from models_Flaks import app,BasemapModel
-from MultiLinearRegression_Test import MultiLinearRegression_Test
+from MultiLinearRegression_Prediction import MultiLinearRegression_Prediction
 
 
-
+#HTTPRequest1, return the information for map
 @app.route('/stations', methods=['GET'])
 def Show_basemap():
     if request.method == 'GET':
@@ -29,11 +29,12 @@ def Show_basemap():
 if __name__ == '__main__':
     app.run(debug=True)
 
-
+#HTTPRequest2: return information for visualizaton
 @app.route('/prediction/<locality_code>/<started>/<ended>/<effect>/<effect2>', methods=['GET'])
 def handle_linearRegressionTest(locality_code, started, ended, effect, effect2):
     if request.method == 'GET':
-        # store the response of URL
-        response = MultiLinearRegression_Test(locality_code, started, ended, effect, effect2)
+        response = MultiLinearRegression_Prediction(locality_code, started, ended, effect, effect2)
 
         return (response)
+if __name__ == '__main__':
+    app.run(debug=True)

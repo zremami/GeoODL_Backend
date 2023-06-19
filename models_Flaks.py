@@ -15,7 +15,7 @@ db.init_app(app)
 # apply changes in the database 
 migrate = Migrate(app, db)
 
-
+# mapp PMultiLinearRegression_Trained table
 class BasemapModel(db.Model):
     __tablename__ = 'PMultiLinearRegression_Trained'
 
