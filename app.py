@@ -30,10 +30,10 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 #HTTPRequest2: return information for visualizaton
-@app.route('/prediction/<locality_code>/<started>/<ended>/<effect>/<effect2>', methods=['GET'])
-def handle_linearRegressionTest(locality_code, started, ended, effect, effect2):
+@app.route('/prediction/<locality_code>/<started>/<ended>/<effect1>/<effect2>', methods=['GET'])
+def handle_linearRegressionTest(locality_code, started, ended, effect1, effect2):
     if request.method == 'GET':
-        response = MultiLinearRegression_Prediction(locality_code, started, ended, effect, effect2)
+        response = MultiLinearRegression_Prediction(locality_code, started, ended, effect1, effect2)
 
         return (response)
 if __name__ == '__main__':

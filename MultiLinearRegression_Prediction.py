@@ -11,7 +11,7 @@ import statistics
 from dtos import predictionDTO 
 from datetime import datetime
 
-def MultiLinearRegression_Prediction(locality_code,start,end, effect, effect2):
+def MultiLinearRegression_Prediction(locality_code,start,end, effect1, effect2):
 
     #connect to database
     engine = db.create_engine('postgresql://postgres:123456@localhost:5432/geoODLdb')
@@ -76,9 +76,9 @@ def MultiLinearRegression_Prediction(locality_code,start,end, effect, effect2):
         b_month_string = 'b_Month' + str(df7_dummies['Month_'][index])
         append_odl = float(
             df_M['b0'] + #b0
-            (df_M['b_Precipitation'] * df_7days['Value_precipitation'][index])*float(effect) + #b1x1
-            (df_M['b_PrecipitationMinus2'] * df_7days['Value_precipitationMinus2'][index])*float(effect2)+ #b2x2
-            (df_M[b_month_string] * 1) #b3x3
+            df_M['b_Precipitation'] * (df_7days['Value_precipitation'][index] * float(effect1)) + #b1x1
+            df_M['b_PrecipitationMinus2'] * (df_7days['Value_precipitationMinus2'][index] * float(effect2)) + #b2x2
+            df_M[b_month_string] #b3x3
         )
         y_prediction.append(float("%.3f" % append_odl))
 
