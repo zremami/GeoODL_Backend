@@ -13,7 +13,7 @@ AGDR data has been collected from BfS measurement stations, while precipitation 
 # The data mining phase has been done in a project with the following address:
  - [GeoODL](https://github.com/zremami/GeoODL.git)
 
-# The client side can be found via this address:
+# The client-side can be found via this address:
  - [GeoODL_Frontend](https://github.com/zremami/GeoODL_Frontend.git)
 
 
